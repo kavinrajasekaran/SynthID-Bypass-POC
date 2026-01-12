@@ -67,7 +67,7 @@ init();
 
 async function init() {
   if (!("gpu" in navigator)) {
-    setStatus("WebGPU not available. Try Chrome/Edge 121+ with a compatible GPU.", true);
+    setStatus("WebGPU not available. Use Chrome/Edge 121+ with WebGPU enabled.", true);
     return;
   }
 
@@ -92,7 +92,7 @@ async function init() {
     usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
   });
 
-  setStatus("WebGPU ready. Load an image to begin.");
+  setStatus("WebGPU ready. Load an image to begin analysis.");
   processBtn.disabled = true;
 }
 
@@ -114,7 +114,7 @@ fileInput.addEventListener("change", async (event) => {
   origCtx.clearRect(0, 0, origCanvas.width, origCanvas.height);
   origCtx.drawImage(imageBitmap, 0, 0, origCanvas.width, origCanvas.height);
   processBtn.disabled = !device;
-  setStatus("Image loaded. Adjust radius/blend then run.");
+  setStatus("Image loaded. Adjust radius/blend then run the robustness test.");
 });
 
 radiusEl.addEventListener("input", () => {
@@ -151,7 +151,7 @@ async function runDenoise() {
     return;
   }
 
-  setStatus("Processing...");
+  setStatus("Processing robustness filter...");
   processBtn.disabled = true;
 
   const width = imageBitmap.width;
@@ -233,19 +233,19 @@ async function runDenoise() {
 
   readBuffer.unmap();
 
-  // If GPU path failed (all zeros), fall back to CPU blur so the user still sees output.
+  // If GPU readback returns zeros, re-run via CPU spatial box blur + blend.
   const nonZero = data.some((v) => v !== 0);
   let finalData = data;
   if (!nonZero) {
     console.warn("GPU output was empty; falling back to CPU blur.");
     finalData = cpuDenoiseCPU(imageBitmap, radius, blend);
-    setStatus("GPU output was empty; CPU fallback applied.", true);
+    setStatus("GPU output empty; CPU fallback applied for analysis.", true);
   }
 
   const imageData = new ImageData(finalData, width, height);
   filteredCtx.putImageData(imageData, 0, 0);
 
-  setStatus("Done. Visual tweaks applied.");
+  setStatus("Done. Review filtered output for watermark persistence.");
   processBtn.disabled = false;
 }
 

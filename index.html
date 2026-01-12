@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SynthID Remover - WebGPU PoC</title>
+  <title>SynthID Robustness Analysis - WebGPU PoC</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="page">
     <header>
-      <h1>WebGPU Denoising (SynthID Disruption PoC)</h1>
-      <p>This runs locally. It applies a very mild spatial denoise to gently perturb SynthID watermarks while keeping the image visually similar.</p>
+      <p class="disclaimer"><strong>Research-only PoC.</strong> Educational evaluation of watermark robustness to mild signal filtering to help improve resilient provenance systems.</p>
+      <h1>WebGPU Watermark Robustness Analysis</h1>
+      <p>This runs locally. It applies a mild spatial filter to study SynthID watermark persistence while keeping the image visually similar.</p>
     </header>
 
     <section class="controls"> 
@@ -26,7 +27,7 @@
         <label for="blend">Blend: <span id="blend-value">0.25</span></label>
         <input id="blend" type="range" min="0" max="1" step="0.05" value="0.25" />
       </div>
-      <button id="process" disabled>Run mild denoise</button>
+      <button id="process" disabled>Evaluate watermark persistence</button>
       <p id="status"></p>
       <noscript><strong>Enable JavaScript to run the WebGPU filter.</strong></noscript>
     </section>

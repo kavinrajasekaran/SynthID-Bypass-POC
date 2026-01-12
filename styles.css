@@ -25,6 +25,16 @@ header p {
   color: #9ba3af;
 }
 
+.disclaimer {
+  background: #2d3748;
+  color: #e6edf3;
+  padding: 10px 12px;
+  border: 1px solid #4a5568;
+  border-radius: 8px;
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;
