@@ -103,3 +103,25 @@ canvas {
   border: 1px solid #30363d;
   border-radius: 8px;
 }
+
+.crop-tools {
+  margin-top: 18px;
+  padding: 12px 16px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.crop-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.crop-tools p {
+  margin: 6px 0;
+}

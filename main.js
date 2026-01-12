@@ -7,6 +7,9 @@ const blendEl = document.getElementById("blend");
 const blendValue = document.getElementById("blend-value");
 const origCanvas = document.getElementById("orig");
 const filteredCanvas = document.getElementById("filtered");
+const saveCropBtn = document.getElementById("save-crop");
+const clearCropBtn = document.getElementById("clear-crop");
+const cropHint = document.getElementById("crop-hint");
 
 const origCtx = origCanvas.getContext("2d");
 const filteredCtx = filteredCanvas.getContext("2d");
@@ -16,6 +19,9 @@ let device;
 let imageBitmap = null;
 let computePipeline = null;
 let uniformBuffer = null;
+let lastFilteredImageData = null;
+let cropRect = null;
+let isDragging = false;
 
 const shaderCode = /* wgsl */ `
 struct Params {
@@ -133,6 +139,59 @@ processBtn.addEventListener("click", () => {
   });
 });
 
+filteredCanvas.addEventListener("mousedown", (e) => {
+  if (!lastFilteredImageData) return;
+  const { x, y } = getCanvasCoords(e);
+  isDragging = true;
+  cropRect = { x, y, w: 0, h: 0 };
+  redrawFilteredWithCrop();
+});
+
+filteredCanvas.addEventListener("mousemove", (e) => {
+  if (!isDragging || !cropRect) return;
+  const { x, y } = getCanvasCoords(e);
+  cropRect.w = x - cropRect.x;
+  cropRect.h = y - cropRect.y;
+  redrawFilteredWithCrop();
+});
+
+filteredCanvas.addEventListener("mouseup", () => {
+  if (!isDragging) return;
+  isDragging = false;
+  normalizeCrop();
+  redrawFilteredWithCrop();
+  updateCropUi();
+});
+
+filteredCanvas.addEventListener("mouseleave", () => {
+  if (!isDragging) return;
+  isDragging = false;
+  normalizeCrop();
+  redrawFilteredWithCrop();
+  updateCropUi();
+});
+
+clearCropBtn.addEventListener("click", () => {
+  cropRect = null;
+  redrawFilteredWithCrop();
+  updateCropUi();
+});
+
+saveCropBtn.addEventListener("click", () => {
+  if (!cropRect || !lastFilteredImageData) return;
+  const { x, y, w, h } = cropRect;
+  if (w < 1 || h < 1) return;
+  const out = document.createElement("canvas");
+  out.width = w;
+  out.height = h;
+  const ctx = out.getContext("2d");
+  ctx.putImageData(lastFilteredImageData, -x, -y);
+  const link = document.createElement("a");
+  link.download = "filtered-crop.png";
+  link.href = out.toDataURL("image/png");
+  link.click();
+});
+
 function resizeCanvases(width, height) {
   [origCanvas, filteredCanvas].forEach((canvas) => {
     canvas.width = width;
@@ -244,6 +303,9 @@ async function runDenoise() {
 
   const imageData = new ImageData(finalData, width, height);
   filteredCtx.putImageData(imageData, 0, 0);
+  lastFilteredImageData = imageData;
+  cropRect = null;
+  updateCropUi();
 
   setStatus("Done. Review filtered output for watermark persistence.");
   processBtn.disabled = false;
@@ -286,4 +348,53 @@ function cpuDenoiseCPU(bitmap, radius, blend) {
     }
   }
   return out;
+}
+
+function getCanvasCoords(event) {
+  const rect = filteredCanvas.getBoundingClientRect();
+  const scaleX = filteredCanvas.width / rect.width;
+  const scaleY = filteredCanvas.height / rect.height;
+  return {
+    x: Math.max(0, Math.min(filteredCanvas.width, (event.clientX - rect.left) * scaleX)),
+    y: Math.max(0, Math.min(filteredCanvas.height, (event.clientY - rect.top) * scaleY)),
+  };
+}
+
+function normalizeCrop() {
+  if (!cropRect) return;
+  const x1 = Math.min(cropRect.x, cropRect.x + cropRect.w);
+  const y1 = Math.min(cropRect.y, cropRect.y + cropRect.h);
+  const x2 = Math.max(cropRect.x, cropRect.x + cropRect.w);
+  const y2 = Math.max(cropRect.y, cropRect.y + cropRect.h);
+  cropRect = {
+    x: Math.max(0, x1),
+    y: Math.max(0, y1),
+    w: Math.min(filteredCanvas.width, x2) - Math.max(0, x1),
+    h: Math.min(filteredCanvas.height, y2) - Math.max(0, y1),
+  };
+}
+
+function redrawFilteredWithCrop() {
+  if (lastFilteredImageData) {
+    filteredCtx.putImageData(lastFilteredImageData, 0, 0);
+  }
+  if (cropRect && cropRect.w !== 0 && cropRect.h !== 0) {
+    filteredCtx.save();
+    filteredCtx.strokeStyle = "#00e0ff";
+    filteredCtx.lineWidth = 2;
+    filteredCtx.setLineDash([6, 4]);
+    filteredCtx.strokeRect(cropRect.x, cropRect.y, cropRect.w, cropRect.h);
+    filteredCtx.restore();
+  }
+}
+
+function updateCropUi() {
+  const hasCrop = !!(cropRect && cropRect.w > 0 && cropRect.h > 0);
+  saveCropBtn.disabled = !hasCrop;
+  clearCropBtn.disabled = !hasCrop;
+  if (hasCrop) {
+    cropHint.textContent = `Crop ready: ${Math.round(cropRect.w)} x ${Math.round(cropRect.h)} px.`;
+  } else {
+    cropHint.textContent = "No crop selected.";
+  }
 }

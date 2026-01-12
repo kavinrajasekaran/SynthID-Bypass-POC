@@ -42,6 +42,18 @@
         <canvas id="filtered" width="512" height="512"></canvas>
       </div>
     </section>
+
+    <section class="crop-tools">
+      <div>
+        <h2>Crop & save</h2>
+        <p>Drag on the filtered image to pick an area. Everything stays in your browser; nothing is sent anywhere.</p>
+        <p id="crop-hint">No crop selected.</p>
+      </div>
+      <div class="crop-actions">
+        <button id="clear-crop" disabled>Clear selection</button>
+        <button id="save-crop" disabled>Save crop</button>
+      </div>
+    </section>
   </div>
 
   <script type="module" src="main.js"></script>
