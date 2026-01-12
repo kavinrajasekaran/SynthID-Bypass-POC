@@ -19,6 +19,9 @@ This PoC explores how mild signal filtering can affect frequency/spatial waterma
 This PoC illustrates gaps in current AI provenance and watermarking schemes (e.g., SynthID) when subjected to benign-looking signal filtering. Findings should be used to improve detection and resilience, not to bypass provenance. If you are responsible for a watermarking or provenance system, consider this PoC as feedback to harden your approach and align with emerging standards.
 
 ## Usage
+**Live demo:** [https://kavinrajasekaran.dev/SynthID-Bypass-POC/](https://kavinrajasekaran.dev/SynthID-Bypass-POC/)
+
+**Local setup:**
 1. Serve the static files (e.g., `python -m http.server 8000`).
 2. Open `http://localhost:8000` in a WebGPU-capable browser (Chrome/Edge 121+ with WebGPU enabled).
 3. Load an image, adjust radius and blend, then run the robustness test. Observe visual changes and assess watermark persistence downstream.
