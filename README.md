@@ -2,7 +2,7 @@
 This project is an educational vulnerability proof of concept (PoC) to evaluate the robustness of AI watermarking (e.g., SynthID). It is intended to help developers and security teams build more resilient watermarking and provenance systems. Do not use this project for unauthorized removal or evasion of watermarks.
 
 # SynthID Watermark Robustness Analysis (WebGPU/WGSL)
-This PoC explores how mild signal filtering can affect frequency/spatial watermarks. It runs entirely in the browser using WebGPU and WGSL to apply a tunable, low-intensity spatial filter and measure visual persistence of embedded marks.
+This PoC explores how mild signal filtering can affect frequency/spatial watermarks. It runs entirely in your browser using WebGPU and WGSL to apply a tunable, low-intensity spatial filter and measure visual persistence of embedded marks. Images are processed locally; nothing is sent off the device.
 
 ## Technical Implementation (WebGPU/WGSL)
 - WebGPU compute pipeline applies a configurable box blur with adjustable radius and blend to perturb watermark signals while keeping perceptual similarity.
