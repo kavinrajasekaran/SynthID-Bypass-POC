@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SynthID Remover - WebGPU PoC</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>WebGPU Denoising (SynthID Disruption PoC)</h1>
+      <p>This runs locally. It applies a very mild spatial denoise to gently perturb SynthID watermarks while keeping the image visually similar.</p>
+    </header>
+
+    <section class="controls"> 
+      <div class="control">
+        <label for="file-input">Choose image</label>
+        <input id="file-input" type="file" accept="image/*" />
+      </div>
+      <div class="control">
+        <label for="radius">Radius: <span id="radius-value">1</span> px</label>
+        <input id="radius" type="range" min="1" max="4" value="1" />
+      </div>
+      <div class="control">
+        <label for="blend">Blend: <span id="blend-value">0.25</span></label>
+        <input id="blend" type="range" min="0" max="1" step="0.05" value="0.25" />
+      </div>
+      <button id="process" disabled>Run mild denoise</button>
+      <p id="status"></p>
+      <noscript><strong>Enable JavaScript to run the WebGPU filter.</strong></noscript>
+    </section>
+
+    <section class="canvases">
+      <div class="canvas-col">
+        <h2>Original</h2>
+        <canvas id="orig" width="512" height="512"></canvas>
+      </div>
+      <div class="canvas-col">
+        <h2>Filtered</h2>
+        <canvas id="filtered" width="512" height="512"></canvas>
+      </div>
+    </section>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
